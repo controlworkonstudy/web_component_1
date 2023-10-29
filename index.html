@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width">
+    <title>Web Components</title>
+    <style>
+        body {
+            color: #bdc1c6;
+            font-family: Open Sans, Noto Sans, Roboto, Arial, Helvetica, sans-serif;
+            background: #202124;
+            display: flex;
+        }
+
+        wcil-ca {
+            padding: 1em;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Templates -->
+    <template id="tmp-style">
+        <!-- Style -->
+        <style>
+            .wcip {
+                position: relative;
+                height: 50px;
+            }
+
+            .wcip label {
+                position: absolute;
+                left: 12px;
+                top: 15px;
+                transition: all 0.3s ease;
+                z-index: -2;
+            }
+
+            .wcip input,
+            textarea {
+                background-color: transparent;
+                padding: 15px;
+                border: 1px solid #ddd;
+                border-radius: 5px;
+                font-size: 16px;
+                color: white;
+            }
+
+            .wcip input:focus+label,
+            input:not(:placeholder-shown)~label,
+            textarea:focus+label,
+            textarea:not(:placeholder-shown)+label {
+                transform: scale(.7) translate(-10%, -90%);
+                transition-duration: .2s, .01s;
+            }
+
+            .wcip input:focus,
+            textarea:focus {
+                border-color: #fdde55;
+                outline: none;
+            }
+        </style>
+    </template>
+    <template id="tmp-input">
+        <div class="wcip">
+            <input id="input" type="text" placeholder=" " />
+            <label id="label">label</label>
+        </div>
+    </template>
+    <template id="tmp-textarea">
+        <div class="wcip">
+            <textarea id="textarea" placeholder=" " rows="5" cols="30"></textarea>
+            <label id="label">label</label>
+        </div>
+    </template>
+    <!-- Custom Elements -->
+    <wcil-ca visual="textarea" label="Text"></wcil-ca>
+    <wcil-ca visual="input" type="email" label="Email"></wcil-ca>
+    <wcil-ca visual="input" type="number" label="Number"></wcil-ca>
+
+    <script>
+        // Class
+        class WebComponentInputLabel extends HTMLElement {
+            constructor() {
+                super()
+            }
+
+            connectedCallback() {
+                // Shadow DOM
+                const shadow = this.attachShadow({ mode: 'open' })
+                const tmps = document.getElementById('tmp-style')
+                shadow.appendChild(tmps.content.cloneNode(true))
+
+                const tmp = document.getElementById('tmp-' + this.getAttribute('visual'))
+                const el = tmp.content.cloneNode(true)
+                shadow.appendChild(el)
+                this.shadowRoot.getElementById('label').textContent = this.getAttribute('label')
+                const type = this.getAttribute('type')
+                if (type) {
+                    this.shadowRoot.getElementById('input').setAttribute('type', type)
+                }
+            }
+        }
+
+        customElements.define("wcil-ca", WebComponentInputLabel)
+    </script>
+</body>
+
+</html>
